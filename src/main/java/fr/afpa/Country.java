@@ -1,5 +1,9 @@
 package fr.afpa;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
 public class Country {
     private String name;
     private String isoCode;
@@ -29,11 +33,22 @@ public class Country {
         this.isoCode = isoCode;
     }
 
-    // METHOD
+    // METHODS
 
     @Override
     public String toString() {
-        return "Country [name = " + name + ", isoCode = " + isoCode + "]";
+        return name + " | " + isoCode ;
+    }
+
+    //FCT INSTANCIATION COUNTRIES LIST
+    public static List<Country> getCountriesList() {
+        ArrayList<Country> countries = new ArrayList<>();
+        String[] countryCodes = Locale.getISOCountries();
+        for (String countryCode : countryCodes) {
+            Locale obj = Locale.of("", countryCode);
+            countries.add(new Country(obj.getDisplayCountry(), obj.getISO3Country()));
+        }
+        return countries;
     }
 
 }
