@@ -5,6 +5,7 @@ import java.util.List;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -64,7 +65,6 @@ public class App extends Application {
         setButtonSize(butUpElement);
         setButtonSize(butDownElement);
 
-
         // hBoxButtonsUD
         HBox hBoxButtonsUD = new HBox(10);
         hBoxButtonsUD.getChildren().addAll(butUpElement, butDownElement);
@@ -88,15 +88,7 @@ public class App extends Application {
         comboBoxList.addAll(countryList);
 
         ComboBox<Country> comboBoxCountries = new ComboBox<>(comboBoxList);
-        //comboBoxCountries.setPrefWidth(250);
-
-        // ADD LISTENER
-        // comboBoxList.addListener(new ListChangeListener<Country>() {
-        // @Override
-        // public void onChanged(Change<? extends Country> country) {
-        // System.out.print("Something changed !");
-        // }
-        // });
+        // comboBoxCountries.setPrefWidth(250);
 
         // moving buttons
         Button addButton = new Button(">");
@@ -118,7 +110,6 @@ public class App extends Application {
         vBox4buttons.setMargin(addButton, new Insets(0, 0, 0, 10));
         vBox4buttons.setMargin(addAllButton, new Insets(0, 0, 0, 10));
         vBox4buttons.setMargin(getAllButton, new Insets(0, 0, 0, 10));
-        
 
         // listViewCountries
         ListView<Country> listViewCountries = new ListView<>();
@@ -144,32 +135,104 @@ public class App extends Application {
         vBoxGeneral.setMargin(quitButton, new Insets(10, 0, 0, 552));
 
         // ACTIONS
-        addButton.setOnAction(value -> {
-            listViewCountries.getItems().add(comboBoxCountries.getValue());
-            comboBoxCountries.getItems().remove(comboBoxCountries.getValue());
+
+        // ADD LISTENERS
+
+        // If no elements on the right (listViewCountries) => getbutton + getAllButton
+        // => DISABLED
+
+        getButton.setDisable(true);
+        getAllButton.setDisable(true);
+
+        comboBoxList.addListener(new ListChangeListener<Country>() {
+            @Override
+            public void onChanged(Change<? extends Country> country) {
+                if (comboBoxList.isEmpty()) {
+                    addButton.setDisable(true);
+                    addAllButton.setDisable(true);
+                } else {
+                    addButton.setDisable(false);
+                    addAllButton.setDisable(false);
+                }
+            }
         });
 
-        addAllButton.setOnAction(value -> {
+        // If no elements on the left (ComboBoxCountries) => addButton + addAllButton =>
+        // DISABLED
+
+        listViewCountries.getItems().addListener(new ListChangeListener<Country>() {
+            @Override
+            public void onChanged(Change<? extends Country> country) {
+                if (listViewCountries.getItems().isEmpty()) {
+                    getButton.setDisable(true);
+                    getAllButton.setDisable(true);
+                } else {
+                    getButton.setDisable(false);
+                    getAllButton.setDisable(false);
+                }
+            }
+        });
+
+        // ACTIONS
+
+        addButton.setOnAction(e -> {
+            Country countryToMove = comboBoxCountries.getValue(); // OPTIM
+            comboBoxCountries.getItems().remove(countryToMove);
+            listViewCountries.getItems().add(countryToMove);
+        });
+
+        addAllButton.setOnAction(e -> {
             listViewCountries.getItems().addAll(comboBoxCountries.getItems());
             comboBoxCountries.getItems().clear();
         });
 
-        getButton.setOnAction(value -> {
-            comboBoxCountries.getItems().add(listViewCountries.getSelectionModel().getSelectedItem());
-            listViewCountries.getItems().remove(listViewCountries.getSelectionModel().getSelectedItem());
+        getButton.setOnAction(e -> {
+            Country countryToMove = listViewCountries.getSelectionModel().getSelectedItem(); // OPTIM
+            listViewCountries.getItems().remove(countryToMove);
+            comboBoxCountries.getItems().add(countryToMove);
         });
 
-        getAllButton.setOnAction(value -> {
+        getAllButton.setOnAction(e -> {
             comboBoxCountries.getItems().addAll(listViewCountries.getItems());
             listViewCountries.getItems().clear();
         });
 
-        butUpElement.setOnAction(value -> {
-
+        butUpElement.setOnAction(e -> {
+            // recup obslist
+            ObservableList<Country> list = listViewCountries.getItems();
+            // recup e select
+            Country country = listViewCountries.getSelectionModel().getSelectedItem();
+            // recup son index
+            int indexE = list.indexOf(country);
+            if (indexE != 0) {
+                // sup e ancien index
+                list.remove(indexE);
+                // modif index recup
+                indexE--;
+                // insérer objet dans la liste avec l'index
+                list.add(indexE, country);
+                //selc
+                listViewCountries.getSelectionModel().select(indexE);
+            }
         });
 
-        butDownElement.setOnAction(value -> {
-
+        butDownElement.setOnAction(e -> {
+            // recup obslist
+            ObservableList<Country> list = listViewCountries.getItems();
+            // recup e select
+            Country country = listViewCountries.getSelectionModel().getSelectedItem();
+            // recup son index
+            int indexE = list.indexOf(country);
+            if (indexE < list.size() - 1) {
+                // sup e ancien index
+                list.remove(indexE);
+                // modif index recup
+                indexE++;
+                // insérer objet dans la liste avec l'index
+                list.add(indexE, country);
+                //selc
+                listViewCountries.getSelectionModel().select(indexE);
+            }
         });
 
         quitButton.setOnAction(value -> {
