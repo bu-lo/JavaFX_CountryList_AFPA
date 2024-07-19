@@ -198,39 +198,41 @@ public class App extends Application {
         });
 
         butUpElement.setOnAction(e -> {
-            // recup obslist
+            //Recup Obslist
             ObservableList<Country> list = listViewCountries.getItems();
-            // recup e select
+            //Recup e selected
             Country country = listViewCountries.getSelectionModel().getSelectedItem();
-            // recup son index
+            //Recup index e
             int indexE = list.indexOf(country);
+
             if (indexE != 0) {
-                // sup e ancien index
+                //Sup e old index
                 list.remove(indexE);
-                // modif index recup
+                //Modif recup index 
                 indexE--;
-                // insérer objet dans la liste avec l'index
+                //Add obj in list with new index
                 list.add(indexE, country);
-                //selc
+                //Selection of the element
                 listViewCountries.getSelectionModel().select(indexE);
             }
         });
 
         butDownElement.setOnAction(e -> {
-            // recup obslist
+            //Recup Obslist
             ObservableList<Country> list = listViewCountries.getItems();
-            // recup e select
+            //Recup e selected
             Country country = listViewCountries.getSelectionModel().getSelectedItem();
-            // recup son index
+            //Recup index e
             int indexE = list.indexOf(country);
+
             if (indexE < list.size() - 1) {
-                // sup e ancien index
+                //Sup e old index
                 list.remove(indexE);
-                // modif index recup
+                //Modif recup index
                 indexE++;
-                // insérer objet dans la liste avec l'index
+                //Add obj in list with new index
                 list.add(indexE, country);
-                //selc
+                //Selection of the element
                 listViewCountries.getSelectionModel().select(indexE);
             }
         });
